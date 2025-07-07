@@ -1,0 +1,162 @@
+package dev.dejoe.nougall
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.collection.arraySetOf
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import dev.dejoe.nougall.composables.FavoritesScreen
+import dev.dejoe.nougall.composables.HomeScreen
+import dev.dejoe.nougall.composables.SettingsScreen
+import dev.dejoe.nougall.ui.theme.MyApplicationTheme
+
+sealed class Screen(
+    val route: String,
+    val title: String,
+    val selectedIcon: ImageVector,
+    val unselectedIcon: ImageVector
+) {
+    object Home : Screen(
+        "home", "Home", Icons.Filled.Home, Icons.Outlined.Home
+    )
+
+    object Favorites : Screen(
+        "favorites", "Favorites", Icons.Filled.Favorite, Icons.Outlined.FavoriteBorder
+    )
+
+    object Settings : Screen(
+        "settings", "Settings", Icons.Filled.Settings, Icons.Outlined.Settings
+    )
+}
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            MyApplicationTheme {
+                MyApp()
+
+            }
+        }
+    }
+}
+
+@Composable
+fun MyApp() {
+    MainScreen()
+}
+
+@Composable
+fun MainScreen() {
+    val navController = rememberNavController()
+
+    Scaffold(topBar = {
+        TopBar(navController)
+    }, bottomBar = {
+        BottomBar(navController)
+    }) { innerPadding ->
+        NavHost(
+            navController,
+            startDestination = Screen.Home.route,
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            composable(Screen.Home.route) {
+                HomeScreen()
+            }
+            composable(Screen.Favorites.route) {
+                FavoritesScreen()
+            }
+            composable(Screen.Settings.route) {
+                SettingsScreen()
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopBar(navController: NavController) {
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = currentBackStackEntry?.destination?.route
+
+    val topLevelRoutes = arraySetOf(
+        Screen.Home.route, Screen.Favorites.route, Screen.Settings.route
+    )
+
+    val showBackButton = currentRoute != null && currentRoute !in topLevelRoutes
+
+    TopAppBar(title = {
+        Text(
+            when (currentRoute) {
+                Screen.Home.route -> "Home"
+                Screen.Favorites.route -> "Favorites"
+                Screen.Settings.route -> "Settings"
+                "details" -> "Details"
+                else -> "MokTMDB"
+            }
+        )
+    }, navigationIcon = {
+        if (showBackButton) {
+            IconButton(onClick = { navController.popBackStack() }) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+            }
+        }
+    })
+}
+
+
+@Composable
+fun BottomBar(navController: NavController) {
+    val screens = arraySetOf(
+        Screen.Home, Screen.Favorites, Screen.Settings
+    )
+
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = currentBackStackEntry?.destination
+
+    NavigationBar {
+        screens.forEach { screen ->
+            val selected = currentDestination?.route == screen.route
+            NavigationBarItem(icon = {
+                Icon(
+                    imageVector = if (selected) screen.selectedIcon else screen.unselectedIcon,
+                    contentDescription = screen.title
+                )
+            }, label = { Text(screen.title) }, selected = selected, onClick = {
+                navController.navigate(screen.route) {
+                    popUpTo(navController.graph.startDestinationId) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            })
+        }
+    }
+
+}
