@@ -26,12 +26,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import dagger.hilt.android.AndroidEntryPoint
 import dev.dejoe.nougall.composables.FavoritesScreen
 import dev.dejoe.nougall.composables.HomeScreen
+import dev.dejoe.nougall.composables.MovieDetailsScreenRoute
 import dev.dejoe.nougall.composables.SettingsScreen
 import dev.dejoe.nougall.ui.theme.MyApplicationTheme
 
@@ -54,20 +58,20 @@ sealed class Screen(
     )
 }
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MyApplicationTheme {
-                MyApp()
-
+                NougallApp()
             }
         }
     }
 }
 
 @Composable
-fun MyApp() {
+fun NougallApp() {
     MainScreen()
 }
 
@@ -75,24 +79,36 @@ fun MyApp() {
 fun MainScreen() {
     val navController = rememberNavController()
 
-    Scaffold(topBar = {
-        TopBar(navController)
-    }, bottomBar = {
-        BottomBar(navController)
-    }) { innerPadding ->
+    Scaffold(
+        topBar = {
+            TopBar(navController)
+        },
+        bottomBar = {
+            BottomBar(navController)
+        }
+    ) { innerPadding ->
         NavHost(
             navController,
             startDestination = Screen.Home.route,
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Home.route) {
-                HomeScreen()
+                HomeScreen(navController = navController)
             }
             composable(Screen.Favorites.route) {
                 FavoritesScreen()
             }
             composable(Screen.Settings.route) {
                 SettingsScreen()
+            }
+            composable(
+                route = "details/{movieId}",
+                arguments = listOf(
+                    navArgument("movieId") { type = NavType.IntType }
+                )
+            ) { backStackEntry ->
+                val movieId = backStackEntry.arguments?.getInt("movieId") ?: 0
+                MovieDetailsScreenRoute(movieId)
             }
         }
     }
@@ -110,25 +126,27 @@ fun TopBar(navController: NavController) {
 
     val showBackButton = currentRoute != null && currentRoute !in topLevelRoutes
 
-    TopAppBar(title = {
-        Text(
-            when (currentRoute) {
-                Screen.Home.route -> "Home"
-                Screen.Favorites.route -> "Favorites"
-                Screen.Settings.route -> "Settings"
-                "details" -> "Details"
-                else -> "MokTMDB"
-            }
-        )
-    }, navigationIcon = {
-        if (showBackButton) {
-            IconButton(onClick = { navController.popBackStack() }) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+    TopAppBar(
+        title = {
+            Text(
+                when (currentRoute) {
+                    Screen.Home.route -> "Home"
+                    Screen.Favorites.route -> "Favorites"
+                    Screen.Settings.route -> "Settings"
+                    "details" -> "Details"
+                    else -> "MokTMDB"
+                }
+            )
+        },
+        navigationIcon = {
+            if (showBackButton) {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                }
             }
         }
-    })
+    )
 }
-
 
 @Composable
 fun BottomBar(navController: NavController) {
@@ -142,21 +160,25 @@ fun BottomBar(navController: NavController) {
     NavigationBar {
         screens.forEach { screen ->
             val selected = currentDestination?.route == screen.route
-            NavigationBarItem(icon = {
-                Icon(
-                    imageVector = if (selected) screen.selectedIcon else screen.unselectedIcon,
-                    contentDescription = screen.title
-                )
-            }, label = { Text(screen.title) }, selected = selected, onClick = {
-                navController.navigate(screen.route) {
-                    popUpTo(navController.graph.startDestinationId) {
-                        saveState = true
+            NavigationBarItem(
+                icon = {
+                    Icon(
+                        imageVector = if (selected) screen.selectedIcon else screen.unselectedIcon,
+                        contentDescription = screen.title
+                    )
+                },
+                label = { Text(screen.title) },
+                selected = selected,
+                onClick = {
+                    navController.navigate(screen.route) {
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
                     }
-                    launchSingleTop = true
-                    restoreState = true
                 }
-            })
+            )
         }
     }
-
 }
