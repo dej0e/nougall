@@ -2,17 +2,22 @@ package dev.dejoe.nougall.composables
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
+import dev.dejoe.nougall.ui.viewmodel.FavoritesUiState
 import dev.dejoe.nougall.ui.viewmodel.FavoritesViewModel
+import dev.dejoe.nougall.ui.viewmodel.MovieUiState
 
 @Composable
 fun FavoritesScreen(
@@ -20,6 +25,7 @@ fun FavoritesScreen(
     onMovieClick: (Int) -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
+    val listState = rememberLazyListState()
 
     when {
         state.isLoading -> {
@@ -61,7 +67,9 @@ fun FavoritesScreen(
                     onMovieClick = onMovieClick,
                     onFavoriteClick = { movie ->
                         viewModel.removeFavorite(movie.id)
-                    }
+                    },
+                    listState = listState,
+                    showPagingLoader = false
                 )
             }
         }

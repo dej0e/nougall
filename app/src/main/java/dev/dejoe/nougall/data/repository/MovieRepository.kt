@@ -3,6 +3,7 @@ package dev.dejoe.nougall.data.repository
 import dev.dejoe.nougall.data.model.CreditsResponse
 import dev.dejoe.nougall.data.model.Movie
 import dev.dejoe.nougall.data.model.MovieDetailsModel
+import dev.dejoe.nougall.data.model.MovieResponse
 import dev.dejoe.nougall.data.model.toEntity
 import dev.dejoe.nougall.data.model.toFavoriteEntity
 import dev.dejoe.nougall.data.room.MovieDao
@@ -18,9 +19,9 @@ class MovieRepository @Inject constructor(
     private val api: TmdbApiService,
     private val movieDao: MovieDao
 ) {
-    suspend fun getTrendingMovies(timeWindow: TimeWindow): List<Movie> {
+    suspend fun getTrendingMovies(timeWindow: TimeWindow, pageNumber: Int): MovieResponse {
         return try {
-            val result = api.getTrendingMovies(timeWindow.apiParam)
+            val result = api.getTrendingMovies(timeWindow.apiParam, page = pageNumber)
             val entities = result.results?.map {
                 it.toEntity(timeWindow.apiParam)
             } ?: emptyList()
@@ -29,10 +30,13 @@ class MovieRepository @Inject constructor(
             movieDao.insertMovies(entities)
 
             entities.map { it.toDomain() }
+            return result
         } catch (e: Exception) {
             // fallback to Room
-            movieDao.getMoviesByTimeWindow(timeWindow.apiParam)
+            var cachedMovies = movieDao.getMoviesByTimeWindow(timeWindow.apiParam)
                 .map { it.toDomain() }
+            MovieResponse(1, cachedMovies, 1, cachedMovies.size)
+
         }
     }
 

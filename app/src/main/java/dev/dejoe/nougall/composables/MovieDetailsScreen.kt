@@ -159,14 +159,17 @@ private fun MovieDetailsContent(
                 Spacer(modifier = Modifier.width(16.dp))
 
                 Column(
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+
                 ) {
                     Text(
                         text = movie.title ?: "-",
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = Color.White
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
 
                     movie.genres.takeIf { it.isNotEmpty() }?.let { genres ->
                         FlowRow(
@@ -185,8 +188,8 @@ private fun MovieDetailsContent(
                                 ) {
                                     Text(
                                         text = genre.name,
-                                        color = MaterialTheme.colorScheme.onPrimary,
-                                        style = MaterialTheme.typography.labelSmall
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = Color.White
                                     )
                                 }
                             }
@@ -197,7 +200,7 @@ private fun MovieDetailsContent(
                     Text(
                         text = formatDate(movie.releaseDate ?: ""),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = Color.White
                     )
                 }
 
@@ -214,12 +217,12 @@ private fun MovieDetailsContent(
                 Text(
                     text = "\"$tagline\"",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onPrimary,
                     fontWeight = FontWeight.SemiBold,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp)
+                        .padding(top = 16.dp),
+                    color = Color.White
                 )
             }
         }
@@ -228,9 +231,9 @@ private fun MovieDetailsContent(
             Text(
                 text = movie.overview ?: "-",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onPrimary,
                 textAlign = TextAlign.Start,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                color = Color.White
             )
         }
 
@@ -240,8 +243,8 @@ private fun MovieDetailsContent(
                     text = "Cast",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.padding(vertical = 8.dp)
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    color = Color.White
                 )
             }
 
@@ -270,21 +273,21 @@ private fun MovieDetailsContent(
                             Text(text = actor.name?.takeIf { it.isNotBlank() }
                                 ?: actor.originalName?.takeIf { it.isNotBlank() } ?: "-",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onPrimary,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                                 textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth())
+                                modifier = Modifier.fillMaxWidth(),
+                                color = Color.White)
 
                             actor.character?.takeIf { it.isNotBlank() }?.let { character ->
                                 Text(
                                     text = character,
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                     textAlign = TextAlign.Center,
-                                    modifier = Modifier.fillMaxWidth()
+                                    modifier = Modifier.fillMaxWidth(),
+                                    color = Color.White.copy(alpha = 0.75f)
                                 )
                             }
                         }
@@ -299,8 +302,8 @@ private fun MovieDetailsContent(
                     text = "Director${if (nonEmptyDirectors.size > 1) "s" else ""}",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.padding(vertical = 8.dp)
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    color = Color.White
                 )
             }
 
@@ -329,11 +332,11 @@ private fun MovieDetailsContent(
                             Text(text = director.name?.takeIf { it.isNotBlank() }
                                 ?: director.originalName?.takeIf { it.isNotBlank() } ?: "-",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onPrimary,
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis,
                                 textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth())
+                                modifier = Modifier.fillMaxWidth(),
+                                color = Color.White)
                         }
                     }
                 }
@@ -362,7 +365,7 @@ fun FavoriteIcon(
         Icon(
             imageVector = if (fav) Icons.Default.Favorite else Icons.Outlined.FavoriteBorder,
             contentDescription = if (fav) "Unfavorite" else "Favorite",
-            tint = if (fav) Color.Red else MaterialTheme.colorScheme.onPrimary,
+            tint = if (fav) Color.Red else Color.White,
             modifier = Modifier
                 .scale(scale)
                 .size(32.dp)

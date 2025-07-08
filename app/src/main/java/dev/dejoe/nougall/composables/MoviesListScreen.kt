@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,20 +30,35 @@ import dev.dejoe.nougall.data.model.Movie
 fun MoviesListScreen(
     moviesList: List<Movie>,
     onMovieClick: (Int) -> Unit,
-    onFavoriteClick: (Movie) -> Unit
+    onFavoriteClick: (Movie) -> Unit,
+    listState: LazyListState,
+    showPagingLoader: Boolean = false
 ) {
     LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
+        state = listState,
+        modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        items(moviesList) { movie ->
+        items(moviesList, key = { it.id }) { movie ->
             MovieListItem(
-                movie = movie, onClick = { onMovieClick(movie.id) },
+                movie = movie,
+                onClick = { onMovieClick(movie.id) },
                 isFavorite = movie.isFavorite,
                 onFavoriteClick = onFavoriteClick
             )
+        }
+
+        if (showPagingLoader) {
+            item {
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
         }
     }
 }

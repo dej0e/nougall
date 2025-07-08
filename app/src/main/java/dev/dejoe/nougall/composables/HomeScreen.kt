@@ -146,7 +146,7 @@ fun MovieList(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier.height(380.dp)
     ) {
-        items(movies) { movie ->
+        items(movies, key = { it.id }) { movie ->
             MovieCard(
                 movie = movie,
                 isFavorite = movie.isFavorite,
@@ -297,8 +297,7 @@ fun ViewAllCard(onClick: () -> Unit) {
     Column(
         modifier = Modifier
             .width(120.dp)
-            .wrapContentHeight()
-            .clickable(onClick = onClick),
+            .wrapContentHeight(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -307,7 +306,8 @@ fun ViewAllCard(onClick: () -> Unit) {
             modifier = Modifier
                 .size(64.dp)
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)),
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
+                .clickable(onClick = onClick),
             contentAlignment = Alignment.Center
         ) {
             Icon(

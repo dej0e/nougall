@@ -32,28 +32,34 @@ class MovieViewModel @Inject constructor(
 
     private val _selectedTimeWindow = MutableStateFlow(TimeWindow.Today)
     val selectedTimeWindow: StateFlow<TimeWindow> = _selectedTimeWindow.asStateFlow()
+    private val _isPaging = MutableStateFlow(false)
+    val isPaging: StateFlow<Boolean> = _isPaging.asStateFlow()
+
+
+    private var currentPage = 1
+    private var totalPages = 1
 
     init {
         viewModelScope.launch {
             selectedTimeWindow.collect { newWindow ->
+                resetPagination()
                 loadPopularMovies(newWindow)
             }
         }
 
         viewModelScope.launch {
-            repository.observeFavorites()
-                .collect { favorites ->
-                    val favoriteIds = favorites.map { it.id }.toSet()
-                    val annotatedMovies = _uiState.value.movies.map { movie ->
-                        movie.copy(isFavorite = favoriteIds.contains(movie.id))
-                    }
-                    _uiState.update {
-                        it.copy(
-                            favorites = favorites.toSet(),
-                            movies = annotatedMovies
-                        )
-                    }
+            repository.observeFavorites().collect { favorites ->
+                val favoriteIds = favorites.map { it.id }.toSet()
+                val updatedMovies = _uiState.value.movies.map { movie ->
+                    movie.copy(isFavorite = favoriteIds.contains(movie.id))
                 }
+                _uiState.update {
+                    it.copy(
+                        favorites = favorites.toSet(),
+                        movies = updatedMovies
+                    )
+                }
+            }
         }
     }
 
@@ -63,25 +69,42 @@ class MovieViewModel @Inject constructor(
         }
     }
 
-    fun loadPopularMovies(timeWindow: TimeWindow = TimeWindow.Today) {
+    private fun resetPagination() {
+        currentPage = 1
+        totalPages = 1
+        _isPaging.value = false
+    }
+    fun loadPopularMovies(
+        timeWindow: TimeWindow = TimeWindow.Today,
+        page: Int = 1,
+        onComplete: (() -> Unit)? = null
+    ) {
         _uiState.update { it.copy(isLoading = true, error = null) }
         viewModelScope.launch {
             try {
-                val movies = repository.getTrendingMovies(timeWindow)
+                val response = repository.getTrendingMovies(timeWindow, page)
+                totalPages = response.totalPages
 
-                val favoriteIds = uiState.value.favorites.map { it.id }.toSet()
-
-                val annotatedMovies = movies.map { movie ->
+                val favoriteIds = _uiState.value.favorites.map { it.id }.toSet()
+                val newMovies = response.results.map { movie ->
                     movie.copy(isFavorite = favoriteIds.contains(movie.id))
+                }
+
+                val updatedList = if (page == 1) {
+                    newMovies
+                } else {
+                    _uiState.value.movies + newMovies
                 }
 
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        movies = annotatedMovies,
+                        movies = updatedList,
                         error = null
                     )
                 }
+
+                currentPage = page
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
@@ -89,6 +112,20 @@ class MovieViewModel @Inject constructor(
                         error = e.message ?: "Unknown error occurred"
                     )
                 }
+            } finally {
+                onComplete?.invoke()
+            }
+        }
+    }
+
+    fun loadNextPage() {
+        if (currentPage < totalPages && !_uiState.value.isLoading && !isPaging.value) {
+            _isPaging.value = true
+            loadPopularMovies(
+                timeWindow = _selectedTimeWindow.value,
+                page = currentPage + 1
+            ) {
+                _isPaging.value = false
             }
         }
     }
@@ -100,7 +137,14 @@ class MovieViewModel @Inject constructor(
             } else {
                 repository.addFavorite(movie)
             }
+            // Optionally update local state immediately
+            _uiState.update { state ->
+                val updatedList = state.movies.map {
+                    if (it.id == movie.id) it.copy(isFavorite = !it.isFavorite)
+                    else it
+                }
+                state.copy(movies = updatedList)
+            }
         }
     }
 }
-
