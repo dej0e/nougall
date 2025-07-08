@@ -165,14 +165,14 @@ private fun MovieDetailsContent(
                     Text(
                         text = genres.joinToString(" • ") { it.name },
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f)
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = formatDate(movie.releaseDate ?: ""),
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f)
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
 
