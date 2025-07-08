@@ -50,6 +50,13 @@ android {
 
     kotlin {
         jvmToolchain(17)
+        sourceSets.all {
+            languageSettings.optIn("kotlin.ExperimentalStdlibApi")
+            languageSettings.languageVersion = "2.0"
+        }
+        compilerOptions {
+            freeCompilerArgs.add("-Xannotation-default-target=param-property")
+        }
     }
 
     buildFeatures {
