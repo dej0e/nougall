@@ -37,6 +37,8 @@ import dev.dejoe.nougall.composables.FavoritesScreen
 import dev.dejoe.nougall.composables.HomeScreen
 import dev.dejoe.nougall.composables.MovieDetailsScreenRoute
 import dev.dejoe.nougall.composables.SettingsScreen
+import dev.dejoe.nougall.composables.TrendingMoviesListScreen
+import dev.dejoe.nougall.ui.custom.TimeWindow
 import dev.dejoe.nougall.ui.theme.MyApplicationTheme
 
 sealed class Screen(
@@ -46,15 +48,15 @@ sealed class Screen(
     val unselectedIcon: ImageVector
 ) {
     object Home : Screen(
-        "home", "Home", Icons.Filled.Home, Icons.Outlined.Home
+        Constants.Screen.Home, "Home", Icons.Filled.Home, Icons.Outlined.Home
     )
 
     object Favorites : Screen(
-        "favorites", "Favorites", Icons.Filled.Favorite, Icons.Outlined.FavoriteBorder
+        Constants.Screen.Favorites, "Favorites", Icons.Filled.Favorite, Icons.Outlined.FavoriteBorder
     )
 
     object Settings : Screen(
-        "settings", "Settings", Icons.Filled.Settings, Icons.Outlined.Settings
+        Constants.Screen.Settings, "Settings", Icons.Filled.Settings, Icons.Outlined.Settings
     )
 }
 
@@ -95,7 +97,10 @@ fun MainScreen() {
             composable(Screen.Home.route) {
                 HomeScreen(
                     onMovieClick = { movieId ->
-                        navController.navigate("details/$movieId")
+                        navController.navigate(Constants.Screen.movieDetailsRoute(movieId))
+                    },
+                    onViewMoreClick = { timeWindow ->
+                        navController.navigate(Constants.Screen.trendingListRoute(timeWindow.apiParam))
                     }
                 )
             }
@@ -104,6 +109,33 @@ fun MainScreen() {
             }
             composable(Screen.Settings.route) {
                 SettingsScreen()
+            }
+            composable(route = Constants.Screen.TrendingList) {
+                TrendingMoviesListScreen(
+                    onMovieClick = { movieId ->
+                        navController.navigate(Constants.Screen.movieDetailsRoute(movieId))
+                    }
+                )
+
+            }
+            composable(
+                route = Constants.Screen.TrendingListWithArg,
+                arguments = listOf(
+                    navArgument("timeWindow") {
+                        type = NavType.StringType
+                        defaultValue = TimeWindow.Today.apiParam
+                    }
+                )
+            ) { backStackEntry ->
+                val timeWindowParam = backStackEntry.arguments?.getString("timeWindow")
+                val initialTimeWindow = TimeWindow.fromApiParam(timeWindowParam)
+
+                TrendingMoviesListScreen(
+                    onMovieClick = { movieId ->
+                        navController.navigate(Constants.Screen.movieDetailsRoute(movieId))
+                    },
+                    selectedTimeWindow = initialTimeWindow
+                )
             }
             composable(
                 route = "details/{movieId}",

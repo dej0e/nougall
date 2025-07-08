@@ -8,6 +8,6 @@ import java.util.Collections.emptySet
 data class MovieUiState(
     val isLoading: Boolean = false,
     val movies: List<Movie> = emptyList(),
-    val favorites: Set<Int> = emptySet(),
+    val favorites: Set<Movie> = emptySet(),
     val error: String? = null
 )

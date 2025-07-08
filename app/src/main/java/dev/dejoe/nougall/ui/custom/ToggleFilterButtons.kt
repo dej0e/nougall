@@ -19,7 +19,15 @@ import androidx.compose.ui.unit.dp
 
 enum class TimeWindow(val label: String, val apiParam: String) {
     Today("Today", "day"),
-    ThisWeek("This Week", "week")
+    ThisWeek("This Week", "week");
+    companion object {
+        fun fromApiParam(param: String?): TimeWindow {
+            return when (param) {
+                "week" -> ThisWeek
+                else -> Today
+            }
+        }
+    }
 }
 
 

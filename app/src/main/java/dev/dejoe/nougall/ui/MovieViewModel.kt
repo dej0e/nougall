@@ -3,12 +3,14 @@ package dev.dejoe.nougall.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.dejoe.nougall.data.model.Movie
 import dev.dejoe.nougall.data.repository.MovieRepository
 import dev.dejoe.nougall.ui.MovieUiState
 import dev.dejoe.nougall.ui.custom.TimeWindow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Collections.emptyList
@@ -25,16 +27,19 @@ class MovieViewModel @Inject constructor(
     val selectedTimeWindow: StateFlow<TimeWindow> = _selectedTimeWindow.asStateFlow()
 
     init {
-        loadPopularMovies(_selectedTimeWindow.value)
+        viewModelScope.launch {
+            selectedTimeWindow
+                .collect { newWindow ->
+                    loadPopularMovies(newWindow)
+                }
+        }
     }
 
     fun onTimeWindowChanged(newWindow: TimeWindow) {
         if (newWindow != _selectedTimeWindow.value) {
             _selectedTimeWindow.value = newWindow
-            loadPopularMovies(newWindow)
         }
     }
-
     fun loadPopularMovies(timeWindow: TimeWindow = TimeWindow.Today) {
         _uiState.update { it.copy(isLoading = true, error = null) }
         viewModelScope.launch {
@@ -58,12 +63,12 @@ class MovieViewModel @Inject constructor(
         }
     }
 
-    fun toggleFavorite(movieId: Int) {
+    fun toggleFavorite(movie: Movie) {
         _uiState.update { state ->
-            val newFavorites = if (state.favorites.contains(movieId)) {
-                state.favorites - movieId
+            val newFavorites = if (state.favorites.contains(movie)) {
+                state.favorites - movie
             } else {
-                state.favorites + movieId
+                state.favorites + movie
             }
             state.copy(favorites = newFavorites)
         }

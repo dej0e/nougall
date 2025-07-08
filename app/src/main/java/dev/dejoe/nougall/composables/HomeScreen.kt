@@ -66,6 +66,7 @@ private const val TAG = "HomeScreen"
 @Composable
 fun HomeScreen(
     onMovieClick: (movieId: Int) -> Unit,
+    onViewMoreClick: (TimeWindow) -> Unit,
     viewModel: MovieViewModel = hiltViewModel()
 ) {
 
@@ -91,8 +92,6 @@ fun HomeScreen(
                 onFilterSelected = { newFilter ->
                     viewModel.onTimeWindowChanged(newWindow = newFilter)
                 }
-
-
             )
         }
         when {
@@ -124,12 +123,15 @@ fun HomeScreen(
                 MovieList(
                     movies = uiState.movies,
                     favorites = uiState.favorites,
-                    onFavoriteClick = { movieId ->
-                        viewModel.toggleFavorite(movieId)
+                    onFavoriteClick = { movie ->
+                        viewModel.toggleFavorite(movie)
                     },
                     onMovieClick = { movieId ->
                         onMovieClick(movieId)
-                    }
+                    },
+                    onViewMoreClick = {
+                        onViewMoreClick(selectedFilter)
+                    },
                 )
             }
         }
@@ -139,10 +141,10 @@ fun HomeScreen(
 @Composable
 fun MovieList(
     movies: List<Movie>,
-    favorites: Set<Int>,
-    onFavoriteClick: (Int) -> Unit,
-    onMovieClick: (Int) -> Unit
-
+    favorites: Set<Movie>,
+    onFavoriteClick: (Movie) -> Unit,
+    onMovieClick: (Int) -> Unit,
+    onViewMoreClick: () -> Unit,
 ) {
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -151,7 +153,7 @@ fun MovieList(
         items(movies) { movie ->
             MovieCard(
                 movie = movie,
-                isFavorite = favorites.contains(movie.id),
+                isFavorite = favorites.contains(movie),
                 onFavoriteClick = onFavoriteClick,
                 onMovieClick = onMovieClick
 
@@ -166,6 +168,7 @@ fun MovieList(
             ) {
                 ViewAllCard {
                     Log.i(TAG, "MovieList: View All Clicked")
+                    onViewMoreClick()
                 }
             }
         }
@@ -178,7 +181,7 @@ fun MovieList(
 fun MovieCard(
     movie: Movie,
     isFavorite: Boolean,
-    onFavoriteClick: (Int) -> Unit,
+    onFavoriteClick: (Movie) -> Unit,
     onMovieClick: (Int) -> Unit
 
 ) {
@@ -245,7 +248,7 @@ fun MovieCard(
 
                     // Favorite icon
                     IconButton(
-                        onClick = { onFavoriteClick(movie.id) },
+                        onClick = { onFavoriteClick(movie) },
                         modifier = Modifier
                             .size(32.dp)
                             .align(Alignment.CenterHorizontally)
@@ -254,7 +257,6 @@ fun MovieCard(
                                 CircleShape
                             )
                             .padding(horizontal = 4.dp, vertical = 4.dp)
-
 
 
                     ) {
@@ -290,7 +292,6 @@ fun MovieCard(
         )
     }
 }
-
 
 
 @Composable
