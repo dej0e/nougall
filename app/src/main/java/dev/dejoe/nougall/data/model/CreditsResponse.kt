@@ -33,6 +33,12 @@ data class CastMember(
     val order: Int?
 )
 
+fun CastMember.displayName(): String {
+    return name?.takeIf { it.isNotBlank() }
+        ?: originalName?.takeIf { it.isNotBlank() }
+        ?: "-"
+}
+
 @JsonClass(generateAdapter = true)
 data class CrewMember(
     val adult: Boolean,
@@ -51,6 +57,12 @@ data class CrewMember(
     val department: String?,
     val job: String?
 )
+
+fun CrewMember.displayName(): String {
+    return name?.takeIf { it.isNotBlank() }
+        ?: originalName?.takeIf { it.isNotBlank() }
+        ?: "-"
+}
 
 fun CreditsResponse.getDirectors(): List<CrewMember> {
     return crew?.filter { it.job?.equals("Director", ignoreCase = true) == true }

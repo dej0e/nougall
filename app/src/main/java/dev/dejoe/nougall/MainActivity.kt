@@ -150,7 +150,7 @@ fun TopBar(navController: NavController) {
 
 @Composable
 fun BottomBar(navController: NavController) {
-    val screens = arraySetOf(
+    val screens = arrayOf(
         Screen.Home, Screen.Favorites, Screen.Settings
     )
 
@@ -172,7 +172,7 @@ fun BottomBar(navController: NavController) {
                 onClick = {
                     navController.navigate(screen.route) {
                         popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
+                            saveState = false
                         }
                         launchSingleTop = true
                         restoreState = true

@@ -256,7 +256,11 @@ private fun MovieDetailsContent(
                         )
 
                         Text(
-                            text = actor.originalName.orEmpty(),
+                            text = actor.name
+                                ?.takeIf { it.isNotBlank() }
+                                ?: actor.originalName
+                                    ?.takeIf { it.isNotBlank() }
+                                ?: "-",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onPrimary,
                             maxLines = 2,
