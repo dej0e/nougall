@@ -55,7 +55,7 @@ import dev.dejoe.nougall.Utils.formatDate
 import dev.dejoe.nougall.data.model.MovieDetailsModel
 import dev.dejoe.nougall.data.model.getActors
 import dev.dejoe.nougall.data.model.getDirectors
-import dev.dejoe.nougall.ui.MovieDetailsViewModel
+import dev.dejoe.nougall.ui.viewmodel.MovieDetailsViewModel
 
 @Composable
 fun MovieDetailsScreenRoute(

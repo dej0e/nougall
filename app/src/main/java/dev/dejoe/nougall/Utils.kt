@@ -14,4 +14,11 @@ object Utils {
             "-"
         }
     }
+    fun List<Int>.toCommaSeparated(): String =
+        joinToString(",")
+
+    fun String.toIntList(): List<Int> =
+        if (isBlank()) emptyList()
+        else split(",").map { it.toInt() }
 }
+

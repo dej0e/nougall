@@ -105,7 +105,11 @@ fun MainScreen() {
                 )
             }
             composable(Screen.Favorites.route) {
-                FavoritesScreen()
+                FavoritesScreen(
+                    onMovieClick = { movieId ->
+                        navController.navigate(Constants.Screen.movieDetailsRoute(movieId))
+                    }
+                )
             }
             composable(Screen.Settings.route) {
                 SettingsScreen()

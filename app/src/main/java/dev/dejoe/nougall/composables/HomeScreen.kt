@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -29,7 +28,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.CircularProgressIndicator
@@ -44,7 +42,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -52,12 +49,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import dev.dejoe.nougall.Utils.formatDate
 import dev.dejoe.nougall.data.model.Movie
-import dev.dejoe.nougall.ui.MovieUiState
-import dev.dejoe.nougall.ui.MovieViewModel
+import dev.dejoe.nougall.ui.viewmodel.MovieUiState
+import dev.dejoe.nougall.ui.viewmodel.MovieViewModel
 import dev.dejoe.nougall.ui.custom.TimeWindow
 import dev.dejoe.nougall.ui.custom.ToggleFilterButton
 
@@ -122,7 +118,7 @@ fun HomeScreen(
                 Spacer(modifier = Modifier.height(16.dp))
                 MovieList(
                     movies = uiState.movies,
-                    favorites = uiState.favorites,
+
                     onFavoriteClick = { movie ->
                         viewModel.toggleFavorite(movie)
                     },
@@ -141,7 +137,7 @@ fun HomeScreen(
 @Composable
 fun MovieList(
     movies: List<Movie>,
-    favorites: Set<Movie>,
+
     onFavoriteClick: (Movie) -> Unit,
     onMovieClick: (Int) -> Unit,
     onViewMoreClick: () -> Unit,
@@ -153,7 +149,7 @@ fun MovieList(
         items(movies) { movie ->
             MovieCard(
                 movie = movie,
-                isFavorite = favorites.contains(movie),
+                isFavorite = movie.isFavorite,
                 onFavoriteClick = onFavoriteClick,
                 onMovieClick = onMovieClick
 
@@ -248,7 +244,9 @@ fun MovieCard(
 
                     // Favorite icon
                     IconButton(
-                        onClick = { onFavoriteClick(movie) },
+                        onClick = {
+                            onFavoriteClick(movie)
+                        },
                         modifier = Modifier
                             .size(32.dp)
                             .align(Alignment.CenterHorizontally)

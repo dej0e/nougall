@@ -1,9 +1,10 @@
-package dev.dejoe.nougall.ui
+package dev.dejoe.nougall.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.dejoe.nougall.data.model.MovieDetailsModel
+import dev.dejoe.nougall.data.model.toMovie
 import dev.dejoe.nougall.data.repository.MovieRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,9 +36,11 @@ class MovieDetailsViewModel @Inject constructor(
             try {
                 val movieDeferred = async { repository.getMovieDetails(movieId) }
                 val creditsDeferred = async { repository.getMovieCredits(movieId) }
+                val isFavoriteDeferred = async { repository.isFavorite(movieId) }
 
                 val movie = movieDeferred.await()
                 val credits = creditsDeferred.await()
+                val isFavorite = isFavoriteDeferred.await()
 
                 movie.credits = credits
 
@@ -45,6 +48,7 @@ class MovieDetailsViewModel @Inject constructor(
                     it.copy(
                         isLoading = false,
                         movie = movie,
+                        isFavorite = isFavorite,
                         error = null
                     )
                 }
@@ -60,8 +64,29 @@ class MovieDetailsViewModel @Inject constructor(
     }
 
     fun toggleFavorite() {
-        _uiState.update { current ->
-            current.copy(isFavorite = !current.isFavorite)
+        val movieDetails = _uiState.value.movie ?: return
+
+        viewModelScope.launch {
+            try {
+                val currentlyFavorite = repository.isFavorite(movieDetails.id)
+                if (currentlyFavorite) {
+                    repository.removeFavorite(movieDetails.id)
+                } else {
+                    repository.addFavorite(movieDetails.toMovie())
+                }
+
+                // re-fetch favorite status to be sure
+                val updatedIsFavorite = repository.isFavorite(movieDetails.id)
+                _uiState.update { current ->
+                    current.copy(isFavorite = updatedIsFavorite)
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        error = e.message ?: "Failed to toggle favorite"
+                    )
+                }
+            }
         }
     }
 }

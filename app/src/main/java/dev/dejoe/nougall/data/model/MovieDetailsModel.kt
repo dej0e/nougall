@@ -69,3 +69,13 @@ data class MovieDetailsModel(
     val spokenLanguages: List<SpokenLanguage> = emptyList(),
     var credits:CreditsResponse?
 )
+
+
+fun MovieDetailsModel.toMovie(): Movie {
+    return Movie(
+        id = this.id,
+        title = this.title,
+        originalTitle = this.originalTitle,
+        posterPath = this.posterPath,
+    )
+}

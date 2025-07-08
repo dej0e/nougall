@@ -21,8 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import dev.dejoe.nougall.ui.MovieUiState
-import dev.dejoe.nougall.ui.MovieViewModel
+import dev.dejoe.nougall.ui.viewmodel.MovieUiState
+import dev.dejoe.nougall.ui.viewmodel.MovieViewModel
 import dev.dejoe.nougall.ui.custom.TimeWindow
 import dev.dejoe.nougall.ui.custom.ToggleFilterButton
 
@@ -85,7 +85,6 @@ fun TrendingMoviesListScreen(
                 Spacer(modifier = Modifier.height(16.dp))
                 MoviesListScreen(
                     moviesList = uiState.movies,
-                    favorites = uiState.favorites,
                     onMovieClick = onMovieClick,
                     onFavoriteClick = {movie -> viewModel.toggleFavorite(movie)}
                 )

@@ -1,20 +1,26 @@
-package dev.dejoe.nougall.ui
+package dev.dejoe.nougall.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.dejoe.nougall.data.model.Movie
 import dev.dejoe.nougall.data.repository.MovieRepository
-import dev.dejoe.nougall.ui.MovieUiState
 import dev.dejoe.nougall.ui.custom.TimeWindow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Collections
 import java.util.Collections.emptyList
 import javax.inject.Inject
+
+data class MovieUiState(
+    val isLoading: Boolean = false,
+    val movies: List<Movie> = emptyList(),
+    val favorites: Set<Movie> = Collections.emptySet(),
+    val error: String? = null
+)
 
 @HiltViewModel
 class MovieViewModel @Inject constructor(
@@ -23,14 +29,30 @@ class MovieViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(MovieUiState())
     val uiState: StateFlow<MovieUiState> = _uiState.asStateFlow()
+
     private val _selectedTimeWindow = MutableStateFlow(TimeWindow.Today)
     val selectedTimeWindow: StateFlow<TimeWindow> = _selectedTimeWindow.asStateFlow()
 
     init {
         viewModelScope.launch {
-            selectedTimeWindow
-                .collect { newWindow ->
-                    loadPopularMovies(newWindow)
+            selectedTimeWindow.collect { newWindow ->
+                loadPopularMovies(newWindow)
+            }
+        }
+
+        viewModelScope.launch {
+            repository.observeFavorites()
+                .collect { favorites ->
+                    val favoriteIds = favorites.map { it.id }.toSet()
+                    val annotatedMovies = _uiState.value.movies.map { movie ->
+                        movie.copy(isFavorite = favoriteIds.contains(movie.id))
+                    }
+                    _uiState.update {
+                        it.copy(
+                            favorites = favorites.toSet(),
+                            movies = annotatedMovies
+                        )
+                    }
                 }
         }
     }
@@ -40,15 +62,23 @@ class MovieViewModel @Inject constructor(
             _selectedTimeWindow.value = newWindow
         }
     }
+
     fun loadPopularMovies(timeWindow: TimeWindow = TimeWindow.Today) {
         _uiState.update { it.copy(isLoading = true, error = null) }
         viewModelScope.launch {
             try {
-                val result = repository.getTrendingMovies(timeWindow)
+                val movies = repository.getTrendingMovies(timeWindow)
+
+                val favoriteIds = uiState.value.favorites.map { it.id }.toSet()
+
+                val annotatedMovies = movies.map { movie ->
+                    movie.copy(isFavorite = favoriteIds.contains(movie.id))
+                }
+
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        movies = result.results ?: emptyList(),
+                        movies = annotatedMovies,
                         error = null
                     )
                 }
@@ -64,13 +94,13 @@ class MovieViewModel @Inject constructor(
     }
 
     fun toggleFavorite(movie: Movie) {
-        _uiState.update { state ->
-            val newFavorites = if (state.favorites.contains(movie)) {
-                state.favorites - movie
+        viewModelScope.launch {
+            if (repository.isFavorite(movie.id)) {
+                repository.removeFavorite(movie.id)
             } else {
-                state.favorites + movie
+                repository.addFavorite(movie)
             }
-            state.copy(favorites = newFavorites)
         }
     }
 }
+

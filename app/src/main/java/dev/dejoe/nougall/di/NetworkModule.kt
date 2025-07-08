@@ -1,4 +1,4 @@
-package dev.dejoe.nougall.service
+package dev.dejoe.nougall.di
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -8,6 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dev.dejoe.nougall.BuildConfig
 import dev.dejoe.nougall.Constants
+import dev.dejoe.nougall.service.TmdbApiService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit

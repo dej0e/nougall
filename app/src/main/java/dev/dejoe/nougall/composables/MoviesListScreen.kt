@@ -28,7 +28,6 @@ import dev.dejoe.nougall.data.model.Movie
 @Composable
 fun MoviesListScreen(
     moviesList: List<Movie>,
-    favorites: Set<Movie>,
     onMovieClick: (Int) -> Unit,
     onFavoriteClick: (Movie) -> Unit
 ) {
@@ -41,7 +40,7 @@ fun MoviesListScreen(
         items(moviesList) { movie ->
             MovieListItem(
                 movie = movie, onClick = { onMovieClick(movie.id) },
-                isFavorite = favorites.contains(movie),
+                isFavorite = movie.isFavorite,
                 onFavoriteClick = onFavoriteClick
             )
         }

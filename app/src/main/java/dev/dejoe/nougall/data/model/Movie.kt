@@ -2,6 +2,9 @@ package dev.dejoe.nougall.data.model
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import dev.dejoe.nougall.Utils.toCommaSeparated
+import dev.dejoe.nougall.data.room.FavoriteEntity
+import dev.dejoe.nougall.data.room.MovieEntity
 import java.util.Collections.emptyList
 
 @JsonClass(generateAdapter = true)
@@ -31,5 +34,45 @@ data class Movie(
     @Json(name = "original_language")
     val originalLanguage: String? = null,
     @Json(name = "video")
-    val video: Boolean? = null
+    val video: Boolean? = null,
+    var isFavorite: Boolean = false
+
 )
+
+fun Movie.toEntity(timeWindow: String?): MovieEntity {
+    return MovieEntity(
+        id = id,
+        title = title,
+        originalTitle = originalTitle,
+        overview = overview,
+        posterPath = posterPath,
+        backdropPath = backdropPath,
+        releaseDate = releaseDate,
+        voteAverage = voteAverage,
+        voteCount = voteCount,
+        popularity = popularity,
+        adult = adult,
+        genreIds = genreIds.joinToString(","),
+        originalLanguage = originalLanguage,
+        video = video,
+        timeWindow = timeWindow,
+    )
+}
+
+fun Movie.toFavoriteEntity(): FavoriteEntity =
+    FavoriteEntity(
+        id = id,
+        title = title,
+        originalTitle = originalTitle,
+        overview = overview,
+        posterPath = posterPath,
+        backdropPath = backdropPath,
+        releaseDate = releaseDate,
+        voteAverage = voteAverage,
+        voteCount = voteCount,
+        popularity = popularity,
+        adult = adult,
+        genreIds = genreIds.toCommaSeparated(),
+        originalLanguage = originalLanguage,
+        video = video,
+    )
