@@ -18,6 +18,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -40,6 +43,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
@@ -51,8 +55,7 @@ import dev.dejoe.nougall.ui.MovieDetailsViewModel
 
 @Composable
 fun MovieDetailsScreenRoute(
-    movieId: Int,
-    viewModel: MovieDetailsViewModel = hiltViewModel()
+    movieId: Int, viewModel: MovieDetailsViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
 
@@ -77,8 +80,7 @@ fun MovieDetailsScreenRoute(
             MovieDetailsScreen(
                 movie = state.movie!!,
                 isFavorite = state.isFavorite,
-                onToggleFavorite = { viewModel.toggleFavorite() }
-            )
+                onToggleFavorite = { viewModel.toggleFavorite() })
         }
     }
 }
@@ -86,9 +88,7 @@ fun MovieDetailsScreenRoute(
 
 @Composable
 fun MovieDetailsScreen(
-    movie: MovieDetailsModel,
-    isFavorite: Boolean,
-    onToggleFavorite: () -> Unit
+    movie: MovieDetailsModel, isFavorite: Boolean, onToggleFavorite: () -> Unit
 ) {
     val backdropUrl = "https://image.tmdb.org/t/p/w1280${movie.backdropPath}"
     val posterUrl = "https://image.tmdb.org/t/p/w780${movie.posterPath}"
@@ -109,11 +109,8 @@ fun MovieDetailsScreen(
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
-                            Color.Transparent,
-                            Color.Black.copy(alpha = 0.85f),
-                            Color.Black
-                        ),
-                        startY = 300f
+                            Color.Transparent, Color.Black.copy(alpha = 0.85f), Color.Black
+                        ), startY = 0f
                     )
                 )
         )
@@ -129,14 +126,11 @@ fun MovieDetailsScreen(
 
 @Composable
 private fun MovieDetailsContent(
-    movie: MovieDetailsModel,
-    posterUrl: String,
-    isFavorite: Boolean,
-    onToggleFavorite: () -> Unit
+    movie: MovieDetailsModel, posterUrl: String, isFavorite: Boolean, onToggleFavorite: () -> Unit
 ) {
 
     val directors = remember(movie) { movie.credits?.getDirectors() }
-    val actors = remember(movie) { movie.credits?.getActors(limit = 10) }
+    val castMembers = remember(movie) { movie.credits?.getActors(limit = 10) }
 
     Column(
         modifier = Modifier
@@ -183,8 +177,7 @@ private fun MovieDetailsContent(
             }
 
             FavoriteIcon(
-                isFavorite = isFavorite,
-                onClick = onToggleFavorite
+                isFavorite = isFavorite, onClick = onToggleFavorite
             )
         }
 
@@ -209,14 +202,93 @@ private fun MovieDetailsContent(
             textAlign = TextAlign.Start,
             modifier = Modifier.fillMaxWidth()
         )
+
+
+        directors?.takeIf { it.isNotEmpty() }?.let { nonEmptyDirectors ->
+            Text(
+                text = "Director${if (nonEmptyDirectors.size > 1) "s" else ""}",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+            nonEmptyDirectors.forEach { director ->
+                Text(
+                    text = director.name.orEmpty(),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        castMembers?.takeIf { it.isNotEmpty() }?.let { nonEmptyCast ->
+
+            Text(
+                text = "Cast",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+
+            //TODO: Fix layout issues.
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(nonEmptyCast) { actor ->
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        modifier = Modifier
+                            .width(100.dp) // wider for better text wrapping
+                            .wrapContentHeight()
+                    ) {
+                        AsyncImage(
+                            model = actor.profilePath?.let { "https://image.tmdb.org/t/p/w138_and_h175_face$it" }
+                                ?: "",
+                            contentDescription = actor.name,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .width(100.dp)
+                                .height(130.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                        )
+
+                        Text(
+                            text = actor.originalName.orEmpty(),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        actor.character
+                            ?.takeIf { it.isNotBlank() }
+                            ?.let { character ->
+                                Text(
+                                    text = character,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+                    }
+                }
+            }
+        }
     }
 }
 
 
 @Composable
 fun FavoriteIcon(
-    isFavorite: Boolean,
-    onClick: () -> Unit
+    isFavorite: Boolean, onClick: () -> Unit
 ) {
     val targetScale = if (isFavorite) 1.2f else 1f
     val scale by animateFloatAsState(
@@ -237,7 +309,6 @@ fun FavoriteIcon(
             modifier = Modifier
                 .scale(scale)
                 .size(32.dp)
-                .clickable { onClick() }
-        )
+                .clickable { onClick() })
     }
 }
