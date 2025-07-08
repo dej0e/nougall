@@ -93,7 +93,11 @@ fun MainScreen() {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Home.route) {
-                HomeScreen(navController = navController)
+                HomeScreen(
+                    onMovieClick = { movieId ->
+                        navController.navigate("details/$movieId")
+                    }
+                )
             }
             composable(Screen.Favorites.route) {
                 FavoritesScreen()

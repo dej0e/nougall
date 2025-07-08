@@ -10,8 +10,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,6 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -132,146 +136,147 @@ private fun MovieDetailsContent(
     val directors = remember(movie) { movie.credits?.getDirectors() }
     val castMembers = remember(movie) { movie.credits?.getActors(limit = 10) }
 
-    Column(
+    LazyColumn(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 24.dp),
-        verticalArrangement = Arrangement.Bottom
+            .fillMaxSize(),
+        contentPadding = PaddingValues(top = 24.dp, bottom = 24.dp, start = 16.dp, end = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            AsyncImage(
-                model = posterUrl,
-                contentDescription = movie.title,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .width(120.dp)
-                    .height(180.dp)
-                    .clip(RoundedCornerShape(12.dp))
-            )
 
-            Spacer(modifier = Modifier.width(16.dp))
+        item {
 
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = movie.title ?: "-",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimary
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                AsyncImage(
+                    model = posterUrl,
+                    contentDescription = movie.title,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .width(120.dp)
+                        .height(180.dp)
+                        .clip(RoundedCornerShape(12.dp))
                 )
 
-                movie.genres.takeIf { it.isNotEmpty() }?.let { genres ->
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
                     Text(
-                        text = genres.joinToString(" • ") { it.name },
-                        style = MaterialTheme.typography.bodyMedium,
+                        text = movie.title ?: "-",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+
+                    movie.genres.takeIf { it.isNotEmpty() }?.let { genres ->
+                        FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp),
+
+                            ) {
+                            genres.forEach { genre ->
+                                Box(
+                                    modifier = Modifier
+                                        .background(
+                                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                                            shape = RoundedCornerShape(8.dp)
+                                        )
+                                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                                ) {
+                                    Text(
+                                        text = genre.name,
+                                        color = MaterialTheme.colorScheme.onPrimary,
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = formatDate(movie.releaseDate ?: ""),
+                        style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = formatDate(movie.releaseDate ?: ""),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onPrimary
+
+                FavoriteIcon(
+                    isFavorite = isFavorite, onClick = onToggleFavorite
                 )
             }
 
-            FavoriteIcon(
-                isFavorite = isFavorite, onClick = onToggleFavorite
-            )
+            Spacer(modifier = Modifier.height(24.dp))
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        item {
+            movie.tagline?.takeIf { it.isNotBlank() }?.let { tagline ->
+                Text(
+                    text = "\"$tagline\"",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontWeight = FontWeight.SemiBold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp)
+                )
+            }
+        }
 
-        movie.tagline?.takeIf { it.isNotBlank() }?.let { tagline ->
+        item {
             Text(
-                text = "\"$tagline\"",
+                text = movie.overview ?: "-",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onPrimary,
-                fontWeight = FontWeight.SemiBold,
-                textAlign = TextAlign.Center,
+                textAlign = TextAlign.Start,
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
-        Text(
-            text = movie.overview ?: "-",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onPrimary,
-            textAlign = TextAlign.Start,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-
-        directors?.takeIf { it.isNotEmpty() }?.let { nonEmptyDirectors ->
-            Text(
-                text = "Director${if (nonEmptyDirectors.size > 1) "s" else ""}",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
-            nonEmptyDirectors.forEach { director ->
-                Text(
-                    text = director.name.orEmpty(),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
-            }
-            Spacer(modifier = Modifier.height(16.dp))
         }
 
         castMembers?.takeIf { it.isNotEmpty() }?.let { nonEmptyCast ->
+            item {
+                Text(
+                    text = "Cast",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            }
 
-            Text(
-                text = "Cast",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
-
-            //TODO: Fix layout issues.
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(nonEmptyCast) { actor ->
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(4.dp),
-                        modifier = Modifier
-                            .width(100.dp) // wider for better text wrapping
-                            .wrapContentHeight()
-                    ) {
-                        AsyncImage(
-                            model = actor.profilePath?.let { "https://image.tmdb.org/t/p/w138_and_h175_face$it" }
-                                ?: "",
-                            contentDescription = actor.name,
-                            contentScale = ContentScale.Crop,
+            item {
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(nonEmptyCast) { actor ->
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(4.dp),
                             modifier = Modifier
-                                .width(100.dp)
-                                .height(130.dp)
-                                .clip(RoundedCornerShape(8.dp))
-                        )
+                                .width(120.dp)
+                                .wrapContentHeight()
+                        ) {
+                            AsyncImage(model = actor.profilePath?.let {
+                                "https://image.tmdb.org/t/p/w185${it}"
+                            } ?: "",
+                                contentDescription = actor.name,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .aspectRatio(0.75f)
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(8.dp)))
 
-                        Text(
-                            text = actor.name
-                                ?.takeIf { it.isNotBlank() }
-                                ?: actor.originalName
-                                    ?.takeIf { it.isNotBlank() }
-                                ?: "-",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                            Text(text = actor.name?.takeIf { it.isNotBlank() }
+                                ?: actor.originalName?.takeIf { it.isNotBlank() } ?: "-",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth())
 
-                        actor.character
-                            ?.takeIf { it.isNotBlank() }
-                            ?.let { character ->
+                            actor.character?.takeIf { it.isNotBlank() }?.let { character ->
                                 Text(
                                     text = character,
                                     style = MaterialTheme.typography.labelSmall,
@@ -282,6 +287,54 @@ private fun MovieDetailsContent(
                                     modifier = Modifier.fillMaxWidth()
                                 )
                             }
+                        }
+                    }
+                }
+            }
+        }
+
+        directors?.takeIf { it.isNotEmpty() }?.let { nonEmptyDirectors ->
+            item {
+                Text(
+                    text = "Director${if (nonEmptyDirectors.size > 1) "s" else ""}",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            }
+
+            item {
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(nonEmptyDirectors) { director ->
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(4.dp),
+                            modifier = Modifier
+                                .width(120.dp)
+                                .wrapContentHeight()
+                        ) {
+                            AsyncImage(model = director.profilePath?.let {
+                                "https://image.tmdb.org/t/p/w185${it}"
+                            } ?: "",
+                                contentDescription = director.name,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .aspectRatio(0.75f)
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(8.dp)))
+
+                            Text(text = director.name?.takeIf { it.isNotBlank() }
+                                ?: director.originalName?.takeIf { it.isNotBlank() } ?: "-",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth())
+                        }
                     }
                 }
             }

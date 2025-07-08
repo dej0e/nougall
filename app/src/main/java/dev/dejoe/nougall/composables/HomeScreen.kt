@@ -65,7 +65,7 @@ private const val TAG = "HomeScreen"
 
 @Composable
 fun HomeScreen(
-    navController: NavController,
+    onMovieClick: (movieId: Int) -> Unit,
     viewModel: MovieViewModel = hiltViewModel()
 ) {
 
@@ -128,7 +128,7 @@ fun HomeScreen(
                         viewModel.toggleFavorite(movieId)
                     },
                     onMovieClick = { movieId ->
-                        navController.navigate("details/$movieId")
+                        onMovieClick(movieId)
                     }
                 )
             }
