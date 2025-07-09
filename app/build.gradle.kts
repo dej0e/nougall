@@ -1,3 +1,13 @@
+import java.util.Properties
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
+}
+
+val tmdbApiKey = localProperties.getProperty("TMDB_API_KEY") ?: ""
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -24,7 +34,7 @@ android {
         buildConfigField(
             "String",
             "TMDB_API_KEY",
-            "\"${project.findProperty("TMDB_API_KEY") ?: ""}\""
+            "\"$tmdbApiKey\""
         )
     }
 
