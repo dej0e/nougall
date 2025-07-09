@@ -80,13 +80,4 @@ TMDB_API_KEY=abcd1234
 
 ---
 
-## ✅ How to Customize
-
-- Add screenshots under the "Screenshots" section:
-  ```markdown
-  
-  ```
-- Add your license text if open-sourcing
-- Add a "Contributing" section if you'd like contributions
-
 Enjoy exploring movies with Nougall! 🎥
