@@ -9,10 +9,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,8 +35,8 @@ import androidx.navigation.navArgument
 import dagger.hilt.android.AndroidEntryPoint
 import dev.dejoe.nougall.composables.FavoritesScreen
 import dev.dejoe.nougall.composables.HomeScreen
+import dev.dejoe.nougall.composables.InformationScreen
 import dev.dejoe.nougall.composables.MovieDetailsScreenRoute
-import dev.dejoe.nougall.composables.SettingsScreen
 import dev.dejoe.nougall.composables.TrendingMoviesListScreen
 import dev.dejoe.nougall.ui.custom.TimeWindow
 import dev.dejoe.nougall.ui.theme.MyApplicationTheme
@@ -55,8 +55,8 @@ sealed class Screen(
         Constants.Screen.Favorites, "Favorites", Icons.Filled.Favorite, Icons.Outlined.FavoriteBorder
     )
 
-    object Settings : Screen(
-        Constants.Screen.Settings, "Settings", Icons.Filled.Settings, Icons.Outlined.Settings
+    object Info : Screen(
+        Constants.Screen.Info, "Info", Icons.Filled.Info, Icons.Outlined.Info
     )
 }
 
@@ -111,8 +111,8 @@ fun MainScreen() {
                     }
                 )
             }
-            composable(Screen.Settings.route) {
-                SettingsScreen()
+            composable(Screen.Info.route) {
+                InformationScreen()
             }
             composable(route = Constants.Screen.TrendingList) {
                 TrendingMoviesListScreen(
@@ -161,7 +161,9 @@ fun TopBar(navController: NavController) {
     val currentRoute = currentBackStackEntry?.destination?.route
 
     val topLevelRoutes = arraySetOf(
-        Screen.Home.route, Screen.Favorites.route, Screen.Settings.route
+        Screen.Home.route,
+        Screen.Favorites.route,
+        Screen.Info.route
     )
 
     val showBackButton = currentRoute != null && currentRoute !in topLevelRoutes
@@ -169,11 +171,13 @@ fun TopBar(navController: NavController) {
     TopAppBar(
         title = {
             Text(
-                when (currentRoute) {
-                    Screen.Home.route -> "Home"
-                    Screen.Favorites.route -> "Favorites"
-                    Screen.Settings.route -> "Settings"
-                    "details" -> "Details"
+                when {
+                    currentRoute == Screen.Home.route -> "Home"
+                    currentRoute == Screen.Favorites.route -> "Favorites"
+                    currentRoute == Screen.Info.route -> "Information"
+                    currentRoute?.startsWith("details/") == true -> "Details"
+                    currentRoute?.startsWith(Constants.Screen.TrendingList) == true -> "Movies List"
+
                     else -> "MokTMDB"
                 }
             )
@@ -181,7 +185,10 @@ fun TopBar(navController: NavController) {
         navigationIcon = {
             if (showBackButton) {
                 IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back"
+                    )
                 }
             }
         }
@@ -191,7 +198,7 @@ fun TopBar(navController: NavController) {
 @Composable
 fun BottomBar(navController: NavController) {
     val screens = arrayOf(
-        Screen.Home, Screen.Favorites, Screen.Settings
+        Screen.Home, Screen.Favorites, Screen.Info
     )
 
     val currentBackStackEntry by navController.currentBackStackEntryAsState()

@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -38,6 +39,7 @@ fun MoviesListScreen(
         state = listState,
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
+
     ) {
         items(moviesList, key = { it.id }) { movie ->
             MovieListItem(
@@ -77,12 +79,13 @@ fun MovieListItem(
             .clip(RoundedCornerShape(12.dp))
             .clickable { onClick() }
     ) {
-        // Backdrop image
         AsyncImage(
             model = "https://image.tmdb.org/t/p/w780${movie.backdropPath}",
             contentDescription = movie.title,
             contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            placeholder = ColorPainter(MaterialTheme.colorScheme.primary),
+            error = ColorPainter(MaterialTheme.colorScheme.primary)
         )
 
         // Gradient overlay for readability

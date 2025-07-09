@@ -9,7 +9,7 @@ object Constants {
         const val TrendingListWithArg = "trending_list?timeWindow={timeWindow}"
 
         const val Favorites = "favorites"
-        const val Settings = "settings"
+        const val Info = "info"
         fun movieDetailsRoute(movieId: Int): String {
             return "details/$movieId"
         }

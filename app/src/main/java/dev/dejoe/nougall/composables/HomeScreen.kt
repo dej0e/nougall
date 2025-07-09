@@ -77,7 +77,7 @@ fun HomeScreen(
 
         ) {
             Text(
-                text = "Trending",
+                text = "Trending Movies",
                 style = MaterialTheme.typography.titleLarge
             )
 
