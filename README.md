@@ -62,7 +62,7 @@ TMDB_API_KEY=your_tmdb_api_key_here
 ## 🧑‍💻 Developer
 
 - **GitHub:** [dej0e](https://github.com/dej0e)
-- **LinkedIn:** [Dejoe John](https://linkedin.com/in/dejoejohn)
+- **LinkedIn:** [Dejoe John](https://linkedin.com/in/dejoe)
 - **Portfolio:** [dejoe.dev](https://dejoe.dev)
 - **Email:** dejoejohn@gmail.com
 
