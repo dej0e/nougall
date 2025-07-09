@@ -204,7 +204,6 @@ fun MovieCard(
                 modifier = Modifier.fillMaxSize()
             )
 
-            // Put both badges into a Column
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -216,7 +215,6 @@ fun MovieCard(
                     verticalArrangement = Arrangement.spacedBy(6.dp),
                     horizontalAlignment = Alignment.End
                 ) {
-                    // Score badge
                     if (movie.voteAverage != null) {
                         Box(
                             modifier = Modifier
@@ -242,7 +240,6 @@ fun MovieCard(
                     }
 
 
-                    // Favorite icon
                     IconButton(
                         onClick = {
                             onFavoriteClick(movie)
@@ -301,7 +298,6 @@ fun ViewAllCard(onClick: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Circle with arrow
         Box(
             modifier = Modifier
                 .size(64.dp)

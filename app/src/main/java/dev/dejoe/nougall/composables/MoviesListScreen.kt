@@ -114,7 +114,6 @@ fun MovieListItem(
                     .fillMaxHeight()
                     .weight(1f)
             ) {
-                // Top-right badges
                 Column(
                     horizontalAlignment = Alignment.End,
                     verticalArrangement = Arrangement.spacedBy(6.dp),
@@ -138,7 +137,6 @@ fun MovieListItem(
                     }
                 }
 
-                // Bottom-aligned text
                 Column(
                     modifier = Modifier
                         .align(Alignment.BottomStart)

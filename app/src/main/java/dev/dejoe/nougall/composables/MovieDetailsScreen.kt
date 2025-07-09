@@ -99,7 +99,6 @@ fun MovieDetailsScreen(
 
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Load backdrop and extract palette
         AsyncImage(
             model = backdropUrl,
             contentDescription = movie.title,

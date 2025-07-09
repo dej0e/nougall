@@ -137,7 +137,6 @@ class MovieViewModel @Inject constructor(
             } else {
                 repository.addFavorite(movie)
             }
-            // Optionally update local state immediately
             _uiState.update { state ->
                 val updatedList = state.movies.map {
                     if (it.id == movie.id) it.copy(isFavorite = !it.isFavorite)

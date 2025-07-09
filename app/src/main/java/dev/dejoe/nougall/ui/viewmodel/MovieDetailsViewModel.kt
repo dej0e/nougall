@@ -75,7 +75,6 @@ class MovieDetailsViewModel @Inject constructor(
                     repository.addFavorite(movieDetails.toMovie())
                 }
 
-                // re-fetch favorite status to be sure
                 val updatedIsFavorite = repository.isFavorite(movieDetails.id)
                 _uiState.update { current ->
                     current.copy(isFavorite = updatedIsFavorite)

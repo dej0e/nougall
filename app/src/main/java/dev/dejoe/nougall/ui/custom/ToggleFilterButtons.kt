@@ -42,7 +42,7 @@ fun ToggleFilterButton(
             .clip(RoundedCornerShape(20.dp))
             .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
             .padding(2.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp) // spacing between buttons
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         TimeWindow.values().forEach { window ->
             val isSelected = window == selectedFilter
