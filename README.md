@@ -16,7 +16,7 @@
 
 ## 📸 Screenshots
 
-<img src="screenshots/home.png" width="200" alt="Home Screen"> <img src="screenshots/details.png" width="200" alt="Movie Details"> <img src="screenshots/favorites.png" width="200" alt="Favorites"> <img src="screenshots/info.png" width="200" alt="Information">
+<img src="screenshots/home.png" width="250" alt="Home Screen"> <img src="screenshots/details.png" width="250" alt="Movie Details"> <img src="screenshots/favorites.png" width="250" alt="Favorites"> 
 
 ---
 
