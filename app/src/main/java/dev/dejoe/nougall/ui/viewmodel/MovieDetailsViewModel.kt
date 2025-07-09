@@ -42,7 +42,7 @@ class MovieDetailsViewModel @Inject constructor(
                 val credits = creditsDeferred.await()
                 val isFavorite = isFavoriteDeferred.await()
 
-                movie.credits = credits
+                movie?.credits = credits
 
                 _uiState.update {
                     it.copy(

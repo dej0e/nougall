@@ -11,8 +11,10 @@ import dev.dejoe.nougall.Constants
 import dev.dejoe.nougall.service.TmdbApiService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import java.io.IOException
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
@@ -74,5 +76,23 @@ object NetworkModule {
     @Singleton
     fun provideTmdbApi(retrofit: Retrofit): TmdbApiService {
         return retrofit.create(TmdbApiService::class.java)
+    }
+}
+
+suspend fun <T> safeApiCall(
+    call: suspend () -> T,
+    fallback: T
+): T {
+    return try {
+        call()
+    } catch (e: IOException) {
+        // No internet connection, timeout, etc.
+        fallback
+    } catch (e: HttpException) {
+        // HTTP error codes from server
+        fallback
+    } catch (e: Exception) {
+        // Unknown error
+        fallback
     }
 }
