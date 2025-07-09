@@ -1,6 +1,6 @@
 # Nougall 🎬
 
-**Nougall** is an Android app that lets you browse trending movies and view detailed movie information, powered by [The Movie Database (TMDB)](https://www.themoviedb.org/). Built with ❤️ by [Dejoe John](https://dejoe.dev).
+**Nougall** is an Android app that lets you browse trending movies and view detailed movie information, powered by [The Movie Database (TMDB)](https://www.themoviedb.org/). 
 
 ---
 
