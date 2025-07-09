@@ -16,7 +16,10 @@
 
 ## 📸 Screenshots
 
-*(Add screenshots of your app here!)*
+![Home Screen](screenshots/home.png)
+![Movie Details](screenshots/details.png)
+![Favorites](screenshots/favorites.png)
+![Information](screenshots/info.png)
 
 ---
 
@@ -59,16 +62,6 @@ TMDB_API_KEY=your_tmdb_api_key_here
 
 ---
 
-## ⚙️ Requirements
-
-- Android Studio Hedgehog (or newer)
-- Kotlin 1.9+
-- Gradle 8.x
-- Minimum SDK 24
-- TMDB API Key
-
----
-
 ## 🧑‍💻 Developer
 
 - **GitHub:** [dej0e](https://github.com/dej0e)
@@ -77,19 +70,6 @@ TMDB_API_KEY=your_tmdb_api_key_here
 - **Email:** dejoejohn@gmail.com
 
 ---
-
-## 📄 License
-
-*(Optional: Add license info here, e.g. MIT, Apache, etc.)*
-
----
-
-## 🤝 Contributions
-
-Pull requests and issues are welcome!
-
----
-
 ## 💡 Notes
 
 Nougall uses a TMDB API key stored in `local.properties`.
@@ -107,8 +87,7 @@ TMDB_API_KEY=abcd1234
 
 - Add screenshots under the "Screenshots" section:
   ```markdown
-  ![Home Screen](screenshots/home.png)
-  ![Movie Details](screenshots/details.png)
+  
   ```
 - Add your license text if open-sourcing
 - Add a "Contributing" section if you'd like contributions
