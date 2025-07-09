@@ -38,7 +38,7 @@ cd nougall
 
 ### 3. Add API Key to `local.properties`
 
-Open your `local.properties` file in the root of the project and add:
+Open your `local.properties` file in the root of the project (if you don't have one, create one) and add:
 
 ```ini
 TMDB_API_KEY=your_tmdb_api_key_here
