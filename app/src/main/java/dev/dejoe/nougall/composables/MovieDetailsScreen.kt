@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -49,6 +50,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import dev.dejoe.nougall.Utils.formatDate
@@ -138,13 +140,15 @@ private fun MovieDetailsContent(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize(),
-        contentPadding = PaddingValues(top = 24.dp, bottom = 24.dp, start = 16.dp, end = 16.dp),
+        contentPadding = PaddingValues(top = 24.dp, bottom = 24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
 
         item {
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 AsyncImage(
                     model = posterUrl,
                     contentDescription = movie.title,
@@ -161,7 +165,7 @@ private fun MovieDetailsContent(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(2.dp),
 
-                ) {
+                    ) {
                     Text(
                         text = movie.title ?: "-",
                         style = MaterialTheme.typography.headlineSmall,
@@ -231,7 +235,9 @@ private fun MovieDetailsContent(
                 text = movie.overview ?: "-",
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Start,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
                 color = Color.White
             )
         }
@@ -242,22 +248,24 @@ private fun MovieDetailsContent(
                     text = "Cast",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(vertical = 8.dp),
+                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
                     color = Color.White
                 )
             }
 
             item {
                 LazyRow(
+                    contentPadding = PaddingValues(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(nonEmptyCast) { actor ->
                         Column(
+
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.spacedBy(4.dp),
                             modifier = Modifier
                                 .width(120.dp)
-                                .wrapContentHeight()
+                                .heightIn(min = 220.dp)
                         ) {
                             AsyncImage(model = actor.profilePath?.let {
                                 "https://image.tmdb.org/t/p/w185${it}"
@@ -301,14 +309,15 @@ private fun MovieDetailsContent(
                     text = "Director${if (nonEmptyDirectors.size > 1) "s" else ""}",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(vertical = 8.dp),
+                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
                     color = Color.White
                 )
             }
 
             item {
                 LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp)
                 ) {
                     items(nonEmptyDirectors) { director ->
                         Column(
