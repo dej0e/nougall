@@ -143,7 +143,7 @@ fun MovieList(
     onViewMoreClick: () -> Unit,
 ) {
     LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = Modifier.height(380.dp)
     ) {
         items(movies, key = { it.id }) { movie ->
