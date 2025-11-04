@@ -144,7 +144,6 @@ fun MovieList(
 ) {
     LazyRow(
         horizontalArrangement = Arrangement.SpaceEvenly,
-        modifier = Modifier.height(380.dp)
     ) {
         items(movies, key = { it.id }) { movie ->
             MovieCard(
@@ -185,16 +184,17 @@ fun MovieCard(
         modifier = Modifier
             .width(200.dp)
             .wrapContentHeight()
-            .padding(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+            .padding(8.dp)
+            .clickable { onMovieClick(movie.id) },
+        horizontalAlignment = Alignment.CenterHorizontally,
+
+        ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(290.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .background(MaterialTheme.colorScheme.surface)
-                .clickable { onMovieClick(movie.id) }
 
         ) {
             AsyncImage(
@@ -204,63 +204,60 @@ fun MovieCard(
                 modifier = Modifier.fillMaxSize()
             )
 
-            Box(
+
+            Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .align(Alignment.TopEnd)
+                    .padding(6.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+                horizontalAlignment = Alignment.End
             ) {
-                Column(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(6.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp),
-                    horizontalAlignment = Alignment.End
-                ) {
-                    if (movie.voteAverage != null) {
-                        Box(
-                            modifier = Modifier
-                                .background(
-                                    Color(0xFF06234D.toInt()).copy(alpha = 0.6f),
-                                    CircleShape
-                                )
-                                .border(
-                                    width = 1.dp,
-                                    color = Color.White,
-                                    shape = CircleShape
-                                )
-                                .align(Alignment.CenterHorizontally)
-                                .padding(horizontal = 8.dp, vertical = 4.dp)
-                        ) {
-                            Text(
-                                text = "${(movie.voteAverage * 10).toInt()}%",
-                                color = Color.White,
-                                style = MaterialTheme.typography.bodySmall,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-
-
-                    IconButton(
-                        onClick = {
-                            onFavoriteClick(movie)
-                        },
+                if (movie.voteAverage != null) {
+                    Box(
                         modifier = Modifier
-                            .size(32.dp)
-                            .align(Alignment.CenterHorizontally)
                             .background(
                                 Color(0xFF06234D.toInt()).copy(alpha = 0.6f),
                                 CircleShape
                             )
-                            .padding(horizontal = 4.dp, vertical = 4.dp)
-
-
+                            .border(
+                                width = 1.dp,
+                                color = Color.White,
+                                shape = CircleShape
+                            )
+                            .align(Alignment.CenterHorizontally)
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
                     ) {
-                        FavoriteIcon(isFavorite = isFavorite)
+                        Text(
+                            text = "${(movie.voteAverage * 10).toInt()}%",
+                            color = Color.White,
+                            style = MaterialTheme.typography.bodySmall,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
-
-
                 }
+
+
+                IconButton(
+                    onClick = {
+                        onFavoriteClick(movie)
+                    },
+                    modifier = Modifier
+                        .size(32.dp)
+                        .align(Alignment.CenterHorizontally)
+                        .background(
+                            Color(0xFF06234D.toInt()).copy(alpha = 0.6f),
+                            CircleShape
+                        )
+                        .padding(horizontal = 4.dp, vertical = 4.dp)
+
+
+                ) {
+                    FavoriteIcon(isFavorite = isFavorite)
+                }
+
+
             }
+
 
         }
 

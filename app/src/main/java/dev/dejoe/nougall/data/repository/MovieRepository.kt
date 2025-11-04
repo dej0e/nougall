@@ -67,7 +67,7 @@ class MovieRepository @Inject constructor(
     }
 
     fun observeFavorites(): Flow<List<Movie>> = movieDao.observeFavorites().map { favList ->
-        favList.map { it.toMovie() }
+        favList.map { it.toMovie() }.sortedByDescending { it.voteAverage ?: 0.0 }
     }
 
     suspend fun addFavorite(movie: Movie) {

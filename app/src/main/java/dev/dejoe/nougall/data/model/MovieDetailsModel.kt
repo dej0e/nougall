@@ -77,5 +77,8 @@ fun MovieDetailsModel.toMovie(): Movie {
         title = this.title,
         originalTitle = this.originalTitle,
         posterPath = this.posterPath,
+        backdropPath =  this.backdropPath,
+        voteAverage = this.voteAverage,
+        releaseDate = this.releaseDate
     )
 }
