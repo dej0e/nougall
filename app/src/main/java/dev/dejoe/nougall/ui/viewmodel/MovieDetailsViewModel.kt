@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import javax.inject.Inject
 
 
@@ -33,25 +34,28 @@ class MovieDetailsViewModel @Inject constructor(
     fun loadMovieDetails(movieId: Int) {
         _uiState.update { it.copy(isLoading = true, error = null) }
 
+        // Use supervisor scope.
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val movieDeferred = async { repository.getMovieDetails(movieId) }
-                val creditsDeferred = async { repository.getMovieCredits(movieId) }
-                val isFavoriteDeferred = async { repository.isFavorite(movieId) }
+                supervisorScope {
+                    val movieDeferred = async { repository.getMovieDetails(movieId) }
+                    val creditsDeferred = async { repository.getMovieCredits(movieId) }
+                    val isFavoriteDeferred = async { repository.isFavorite(movieId) }
 
-                val movie = movieDeferred.await()
-                val credits = creditsDeferred.await()
-                val isFavorite = isFavoriteDeferred.await()
+                    val movie = runCatching { movieDeferred.await() }.getOrNull()
+                    val credits = runCatching { creditsDeferred.await() }.getOrNull()
+                    val isFavorite = runCatching { isFavoriteDeferred.await() }.getOrDefault(false)
 
-                movie?.credits = credits
+                    movie?.credits = credits
 
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        movie = movie,
-                        isFavorite = isFavorite,
-                        error = null
-                    )
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            movie = movie,
+                            isFavorite = isFavorite,
+                            error = if (movie == null) "Failed to load movie details." else null
+                        )
+                    }
                 }
             } catch (e: Exception) {
                 _uiState.update {
