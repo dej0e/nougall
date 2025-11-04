@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.dejoe.nougall.data.model.Movie
 import dev.dejoe.nougall.data.repository.MovieRepository
 import dev.dejoe.nougall.ui.custom.TimeWindow
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,14 +41,14 @@ class MovieViewModel @Inject constructor(
     private var totalPages = 1
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             selectedTimeWindow.collect { newWindow ->
                 resetPagination()
                 loadPopularMovies(newWindow)
             }
         }
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             repository.observeFavorites().collect { favorites ->
                 val favoriteIds = favorites.map { it.id }.toSet()
                 val updatedMovies = _uiState.value.movies.map { movie ->
@@ -80,7 +81,7 @@ class MovieViewModel @Inject constructor(
         onComplete: (() -> Unit)? = null
     ) {
         _uiState.update { it.copy(isLoading = true, error = null) }
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response = repository.getTrendingMovies(timeWindow, page)
                 totalPages = response.totalPages
@@ -131,7 +132,7 @@ class MovieViewModel @Inject constructor(
     }
 
     fun toggleFavorite(movie: Movie) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             if (repository.isFavorite(movie.id)) {
                 repository.removeFavorite(movie.id)
             } else {

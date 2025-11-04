@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.dejoe.nougall.data.model.MovieDetailsModel
 import dev.dejoe.nougall.data.model.toMovie
 import dev.dejoe.nougall.data.repository.MovieRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,7 +33,7 @@ class MovieDetailsViewModel @Inject constructor(
     fun loadMovieDetails(movieId: Int) {
         _uiState.update { it.copy(isLoading = true, error = null) }
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 val movieDeferred = async { repository.getMovieDetails(movieId) }
                 val creditsDeferred = async { repository.getMovieCredits(movieId) }
@@ -66,7 +67,7 @@ class MovieDetailsViewModel @Inject constructor(
     fun toggleFavorite() {
         val movieDetails = _uiState.value.movie ?: return
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 val currentlyFavorite = repository.isFavorite(movieDetails.id)
                 if (currentlyFavorite) {

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.dejoe.nougall.data.model.Movie
 import dev.dejoe.nougall.data.repository.MovieRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,7 +32,7 @@ class FavoritesViewModel @Inject constructor(
     }
 
     private fun observeFavorites() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 repository.observeFavorites().collect { favorites ->
                     _uiState.update {
@@ -54,7 +55,7 @@ class FavoritesViewModel @Inject constructor(
     }
 
     fun removeFavorite(movieId: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             repository.removeFavorite(movieId)
         }
     }
